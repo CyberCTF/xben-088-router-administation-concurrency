@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://www.isoloom.com/schema/v1.json
+# XBEN-088-24 Router Administation - Concurrency (XBOW's validation benchmarks, by XBOW) as an Isoloom spec:
+# a router administration panel (Flask, MySQL) whose admin pages check authentication and authorization.
+# The benchmark folder benchmarks/XBEN-088-24 of xbow-engineering/validation-benchmarks is vendored
+# unchanged in build/toctou-admin-router/app/, built by its own Dockerfiles; the overlay in build/toctou-admin-router/ bakes in the fixed flag.
+# `isoloom generate`, then `isoloom run docker`.
+version: 1
+name: xben-088-router-administation-concurrency
+
+networks:
+  lab: { cidr: 10.61.131.0/24, internet: false }
+
+machines:
+  db:
+    networks: { lab: 10 }
+    services: [{ port: 3306, name: mysql }]
+    resources: { cpus: 1, memory_mb: 1024 }
+    docker:
+      build: build/db
+
+  toctou-admin-router:
+    networks: { lab: 20 }
+    services: [{ port: 80, name: web, http: true, publish: 80 }]
+    resources: { cpus: 1, memory_mb: 512 }
+    depends_on: [db]
+    docker:
+      build: build/toctou-admin-router
+
+checks:
+  - name: the Router Administation - Concurrency page answers
+    http: http://toctou-admin-router:80/login
+    wait: 180
+  - name: a wrong login is refused
+    script: checks/probe.sh
+    wait: 60
+
+message: |
+  Router Administation - Concurrency answers at http://localhost:{{ machines.toctou-admin-router.services.0.publish }}/.
+  A router admin panel. Its authorization checks may not hold between check and use.
