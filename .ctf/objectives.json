@@ -1,0 +1,72 @@
+{
+  "objectives": [
+    {
+      "key": "main",
+      "title": "Read the flag",
+      "prompt": "Exploit the race condition weakness of a router administration panel (Flask, MySQL) whose admin pages check authentication and authorization and recover the flag (FLAG{...}) it guards.",
+      "check": {
+        "evidence": "SECRET",
+        "format": "FLAG{%s}"
+      },
+      "dev": "FLAG{dev-xben-088-router-administation-concurrency}",
+      "hints": [
+        "Look at what happens between the authorization check and the action it protects.",
+        "The application ships with a demo account; its README or login page may tell you more."
+      ],
+      "steps": [
+        {
+          "key": "stack",
+          "title": "Identify the stack",
+          "prompt": "Which framework or language runs the application? (name only)",
+          "check": {
+            "answer": [
+              "flask",
+              "python",
+              "werkzeug",
+              "python flask"
+            ]
+          }
+        },
+        {
+          "key": "class",
+          "title": "Name the weakness",
+          "prompt": "Which class of flaw lets a check and its use be separated in time?",
+          "check": {
+            "answer": [
+              "race condition",
+              "toctou",
+              "time-of-check to time-of-use",
+              "time of check time of use"
+            ]
+          }
+        },
+        {
+          "key": "timing",
+          "title": "Name the flaw",
+          "prompt": "What is the name of the flaw where a check is made at one time and relied on later?",
+          "check": {
+            "answer": [
+              "toctou",
+              "time-of-check to time-of-use",
+              "race condition"
+            ]
+          }
+        },
+        {
+          "key": "creds",
+          "title": "Name the second weakness",
+          "prompt": "Which weakness gives you a first account without registering?",
+          "check": {
+            "answer": [
+              "default credentials",
+              "default password",
+              "default account",
+              "weak credentials",
+              "demo account"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
